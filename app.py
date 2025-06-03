@@ -2,9 +2,13 @@ from flask import Flask, request, jsonify
 from twilio.rest import Client
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
-import os
 
 app = Flask(__name__)
+
+# Twilio credentials – for local testing
+TWILIO_SID = "ACdd17b77cbddbeece03c10eb5727fc726"
+TWILIO_AUTH_TOKEN = "4eab3dd64f60cc6ca2103453643837b5"
+TWILIO_NUMBER = "+19342382601"
 
 @app.route("/call", methods=["POST"])
 def call_number():
@@ -15,34 +19,32 @@ def call_number():
     if not number or not script:
         return jsonify({"error": "Missing number or script"}), 400
 
-    # Use environment variables
-    account_sid = os.environ.get("TWILIO_SID")
-    auth_token = os.environ.get("TWILIO_AUTH_TOKEN")
-    twilio_number = os.environ.get("TWILIO_NUMBER")
-
-    if not all([account_sid, auth_token, twilio_number]):
-        return jsonify({"error": "Twilio credentials not set"}), 500
-
     try:
-        client = Client(account_sid, auth_token)
+        client = Client(TWILIO_SID, TWILIO_AUTH_TOKEN)
         call = client.calls.create(
             to=number,
-            from_=twilio_number,
+            from_=TWILIO_NUMBER,
             twiml=f'<Response><Say>{script}</Say></Response>'
         )
         return jsonify({"status": "Call initiated", "sid": call.sid})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
 @app.route("/leads", methods=["GET"])
 def get_leads():
-    scope = ["https://spreadsheets.google.com/feeds", "https://www.googleapis.com/auth/drive"]
-    creds = ServiceAccountCredentials.from_json_keyfile_name("service_account.json", scope)
-    sheet = gspread.authorize(creds).open("Rickby Leads").sheet1
-    data = sheet.get_all_records()
-    return jsonify(data)
+    try:
+        scope = [
+            "https://spreadsheets.google.com/feeds",
+            "https://www.googleapis.com/auth/drive"
+        ]
+        creds = ServiceAccountCredentials.from_json_keyfile_name("service_account.json", scope)
+        sheet = gspread.authorize(creds).open("Rickby Leads").sheet1
+        data = sheet.get_all_records()
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
+    import os
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
