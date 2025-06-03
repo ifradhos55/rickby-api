@@ -15,18 +15,25 @@ def call_number():
     if not number or not script:
         return jsonify({"error": "Missing number or script"}), 400
 
+    # Use environment variables
+    account_sid = os.environ.get("TWILIO_SID")
+    auth_token = os.environ.get("TWILIO_AUTH_TOKEN")
+    twilio_number = os.environ.get("TWILIO_NUMBER")
+
+    if not all([account_sid, auth_token, twilio_number]):
+        return jsonify({"error": "Twilio credentials not set"}), 500
+
     try:
-        # Load Twilio credentials from environment
-        client = Client(os.environ["TWILIO_SID"], os.environ["TWILIO_AUTH"])
+        client = Client(account_sid, auth_token)
         call = client.calls.create(
             to=number,
-            from_=os.environ["TWILIO_NUMBER"],
+            from_=twilio_number,
             twiml=f'<Response><Say>{script}</Say></Response>'
         )
         return jsonify({"status": "Call initiated", "sid": call.sid})
     except Exception as e:
-        print("Twilio call error:", str(e))
         return jsonify({"error": str(e)}), 500
+
 
 @app.route("/leads", methods=["GET"])
 def get_leads():
