@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from twilio.rest import Client
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+import os
 
 app = Flask(__name__)
 
@@ -14,13 +15,18 @@ def call_number():
     if not number or not script:
         return jsonify({"error": "Missing number or script"}), 400
 
-    client = Client("TWILIO_SID", "TWILIO_AUTH")
-    call = client.calls.create(
-        to=number,
-        from_="YOUR_TWILIO_NUMBER",
-        twiml=f'<Response><Say>{script}</Say></Response>'
-    )
-    return jsonify({"status": "Call initiated", "sid": call.sid})
+    try:
+        # Load Twilio credentials from environment
+        client = Client(os.environ["TWILIO_SID"], os.environ["TWILIO_AUTH"])
+        call = client.calls.create(
+            to=number,
+            from_=os.environ["TWILIO_NUMBER"],
+            twiml=f'<Response><Say>{script}</Say></Response>'
+        )
+        return jsonify({"status": "Call initiated", "sid": call.sid})
+    except Exception as e:
+        print("Twilio call error:", str(e))
+        return jsonify({"error": str(e)}), 500
 
 @app.route("/leads", methods=["GET"])
 def get_leads():
@@ -31,7 +37,5 @@ def get_leads():
     return jsonify(data)
 
 if __name__ == "__main__":
-    import os
-
-port = int(os.environ.get("PORT", 5000))
-app.run(host="0.0.0.0", port=port)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
