@@ -15,7 +15,6 @@ def call_number():
     if not number or not script:
         return jsonify({"error": "Missing number or script"}), 400
 
-    # Your actual Twilio credentials
     account_sid = "ACdd17b77cbddbeece03c10eb5727fc726"
     auth_token = "d4d0a226c23dc3df93364ba8266339fc"
     twilio_number = "+19342382601"
