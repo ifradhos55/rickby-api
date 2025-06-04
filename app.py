@@ -17,7 +17,7 @@ def call_number():
 
     # Your actual Twilio credentials
     account_sid = "ACdd17b77cbddbeece03c10eb5727fc726"
-    auth_token = "4eab3dd64f60cc6ca2103453643837b5"
+    auth_token = "d4d0a226c23dc3df93364ba8266339fc"
     twilio_number = "+19342382601"
 
     try:
