@@ -1,0 +1,95 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Rickby API",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://rickby-api.onrender.com"
+    }
+  ],
+  "paths": {
+    "/leads": {
+      "get": {
+        "operationId": "getLeads",
+        "summary": "Fetch lead data from Google Sheets",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "Name": {
+                        "type": "string"
+                      },
+                      "Phone": {
+                        "type": "string"
+                      },
+                      "Script": {
+                        "type": "string"
+                      }
+                    },
+                    "required": ["Name", "Phone", "Script"]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/call": {
+      "post": {
+        "operationId": "makeCall",
+        "summary": "Place a call using Twilio and read a message",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "number": {
+                    "type": "string",
+                    "description": "Phone number to call"
+                  },
+                  "script": {
+                    "type": "string",
+                    "description": "Message to say during the call"
+                  }
+                },
+                "required": ["number", "script"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Call was initiated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "sid": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["status", "sid"]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
