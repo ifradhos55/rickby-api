@@ -14,6 +14,7 @@ The agent is designed to operate semi-autonomously, placing and managing calls f
 ## Step-by-Step Build Process
 
 ---
+###✅ Achieved on June 3, 2025
 
 ### Step 1: Core Call Functionality
 **Purpose:** Establish basic outbound call capabilities using Twilio
@@ -23,8 +24,6 @@ The agent is designed to operate semi-autonomously, placing and managing calls f
    - Read a scripted message using Text-to-Speech
    - Hang up after 3–5 rings if unanswered
    - Move on to the next number in the queue
-     
-   ✅ Achieved on June 3, 2025
 
 2. Support lead/script input from a CSV file
 
